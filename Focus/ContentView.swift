@@ -6,16 +6,56 @@
 //
 
 import SwiftUI
+import FamilyControls
+import ManagedSettings
+import FirebaseCore
 
 struct ContentView: View {
+    
+    // needed for access to screen time api
+    let center = AuthorizationCenter.shared
+    
+    // for tab titles
+    enum Tabs: String {
+        case leaderboard
+        case home
+        case profile
+    }
+    
+    @State var selectedTab: Tabs = .home
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        
+        TabView(selection: $selectedTab) {
+            Leaderboard()
+                .tabItem {
+                    Image(systemName: "trophy.fill")
+                    Text("Leaderboard")
+                }
+                .tag(Tabs.leaderboard)
+            Home()
+                .tabItem {
+                    Image(systemName: "house.fill")
+                    Text("Home")
+                }
+                .tag(Tabs.home)
+            Profile()
+                .tabItem {
+                    Image(systemName: "person.circle")
+                    Text("Profile")
+                }
+                .tag(Tabs.profile)
         }
-        .padding()
+        .onAppear {
+            Task {
+                do {
+                    try await center.requestAuthorization(for: .individual)
+                } catch {
+                    print("Failed to enroll with error: \(error)")
+                }
+            }
+        }
+        
     }
 }
 
