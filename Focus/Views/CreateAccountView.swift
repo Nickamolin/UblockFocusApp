@@ -11,7 +11,7 @@ import FirebaseAnalytics
 private enum FocusedField: Hashable {
     case email
     case password
-    case confirmPassord
+    case confirmPassword
 }
 
 struct CreateAccountView: View {
@@ -53,13 +53,11 @@ struct CreateAccountView: View {
             // Password Entry Field
             HStack {
                 Image(systemName: "lock")
-                TextField("Password", text: $viewModel.password)
-                    .textInputAutocapitalization(.never)
-                    .disableAutocorrection(true)
+                SecureField("Password", text: $viewModel.password)
                     .focused($focus, equals: .email)
                     .submitLabel(.next)
                     .onSubmit {
-                        self.focus = .password
+                        self.focus = .confirmPassword
                     }
             }
             .padding(.all, 5.0)
@@ -69,9 +67,7 @@ struct CreateAccountView: View {
             // Confirm Password Entry Field
             HStack {
                 Image(systemName: "lock")
-                TextField("Confirm Password", text: $viewModel.confirmPassword)
-                    .textInputAutocapitalization(.never)
-                    .disableAutocorrection(true)
+                SecureField("Confirm Password", text: $viewModel.confirmPassword)
                     .focused($focus, equals: .email)
                     .submitLabel(.go)
                     .onSubmit {
