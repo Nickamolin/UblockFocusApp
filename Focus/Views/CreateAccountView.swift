@@ -6,36 +6,113 @@
 //
 
 import SwiftUI
+import FirebaseAnalytics
+
+private enum FocusedField: Hashable {
+    case email
+    case password
+    case confirmPassord
+}
 
 struct CreateAccountView: View {
     
     @EnvironmentObject var viewModel: AuthViewModel
     
-    var body: some View {
-        Text("Sign Up View")
-            .font(.title)
-            .padding(.bottom, 20.0)
-        
-        Button {
-            viewModel.menuIsPresented = false
-            viewModel.authenticationState = .authenticated
-        } label: {
-            Text("Create Account")
-        }
-        .buttonStyle(.borderedProminent)
-        
-        HStack {
-            Text("Already have an account? ")
-            Button {
-                viewModel.currentMenuType = .login
-            } label: {
-                Text("Login")
-                    .foregroundColor(.blue)
+    @FocusState private var focus: FocusedField?
+    
+    private func createAccountWithEmailPassword() {
+        Task {
+            if await viewModel.createAccountWithEmailPassword() == true {
+                viewModel.menuIsPresented = false
             }
+        }
+    }
+    
+    var body: some View {
+        VStack {
+            Text("Create Account View")
+                .font(.title)
+                .padding(.bottom, 20.0)
+            
+            // Email Entry Field
+            HStack {
+                Image(systemName: "at")
+                TextField("Email", text: $viewModel.email)
+                    .textInputAutocapitalization(.never)
+                    .disableAutocorrection(true)
+                    .focused($focus, equals: .email)
+                    .submitLabel(.next)
+                    .onSubmit {
+                        self.focus = .password
+                    }
+            }
+            .padding(.all, 5.0)
+            .background(Divider(), alignment: .bottom)
+            .padding(.all, 5.0)
+            
+            // Password Entry Field
+            HStack {
+                Image(systemName: "lock")
+                TextField("Password", text: $viewModel.password)
+                    .textInputAutocapitalization(.never)
+                    .disableAutocorrection(true)
+                    .focused($focus, equals: .email)
+                    .submitLabel(.next)
+                    .onSubmit {
+                        self.focus = .password
+                    }
+            }
+            .padding(.all, 5.0)
+            .background(Divider(), alignment: .bottom)
+            .padding(.all, 5.0)
+            
+            // Confirm Password Entry Field
+            HStack {
+                Image(systemName: "lock")
+                TextField("Confirm Password", text: $viewModel.confirmPassword)
+                    .textInputAutocapitalization(.never)
+                    .disableAutocorrection(true)
+                    .focused($focus, equals: .email)
+                    .submitLabel(.go)
+                    .onSubmit {
+                        createAccountWithEmailPassword()
+                    }
+            }
+            .padding(.all, 5.0)
+            .background(Divider(), alignment: .bottom)
+            .padding(.all, 5.0)
+            
+            if !viewModel.errorMessage.isEmpty {
+                VStack {
+                    Text(viewModel.errorMessage)
+                        .foregroundStyle(.red)
+                }
+            }
+            
+            
+            Button {
+                createAccountWithEmailPassword()
+            } label: {
+                Text("Create Account")
+            }
+            .padding(.all, 20.0)
+            .buttonStyle(.borderedProminent)
+            
+            HStack {
+                Text("Already have an account? ")
+                Button {
+                    viewModel.currentMenuType = .login
+                } label: {
+                    Text("Login")
+                        .foregroundColor(.blue)
+                }
+            }
+            
         }
     }
 }
 
 #Preview {
     CreateAccountView()
+        .environmentObject(AuthViewModel())
 }

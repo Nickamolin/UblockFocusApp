@@ -47,8 +47,25 @@ extension AuthViewModel {
     func createAccountWithEmailPassword() async -> Bool {
         authenticationState = .authenticating
         
-        authenticationState = .authenticated
-        return true
+        if (password != confirmPassword) {
+            errorMessage = "Passwords do not match."
+            authenticationState = .unauthenticated
+            return false
+        }
+        
+        do {
+            let authResult = try await Auth.auth().createUser(withEmail: email, password: password)
+            user = authResult.user
+            print("User \(authResult.user.uid) signed in")
+            authenticationState = .authenticated
+            displayName = user?.email ?? "(unknown)"
+            return true
+        } catch {
+            print(error)
+            errorMessage = error.localizedDescription
+            authenticationState = .unauthenticated
+            return false
+        }
     }
     
     func signOut() {
