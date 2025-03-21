@@ -10,32 +10,55 @@ import FirebaseAnalytics
 
 struct Profile: View {
     
-    @StateObject private var viewModel = AuthViewModel()
+    @EnvironmentObject var viewModel: AuthViewModel
     
-    // View Toggling Controls
-    enum menuType {
-        case login
-        case signup
+    private func deleteAccount() {
+        Task {
+            await viewModel.deleteAccount()
+        }
     }
-    
-    enum authenticationStatus {
-        case authenticated
-        case unauthenticated
-    }
-    
-    @State var authenticationStatus: authenticationStatus = .unauthenticated
-    @State var menuType: menuType = .login
-    
-    @State var menuIsPresented = false
     
     var body: some View {
         NavigationStack {
             VStack {
-                if self.authenticationStatus == .unauthenticated {
+                if viewModel.authenticationState == .authenticated {
+                    
                     Image(systemName: "person.circle")
                         .padding(.bottom, 5.0)
                         .font(.system(size: 100.0))
+                    
+                    Text("Signed in as user: \(viewModel.displayName)")
+                    
+                    Button {
+                        viewModel.signOut()
+                    } label: {
+                        Text("Sign Out")
+                            .foregroundColor(.blue)
+                    }
+                    
+                    Button {
+                        deleteAccount()
+                    } label: {
+                        Text("Delete Account")
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .accentColor(.red)
+                    
+                    if !viewModel.errorMessage.isEmpty {
+                        VStack {
+                            Text(viewModel.errorMessage)
+                                .foregroundStyle(.red)
+                        }
+                    }
+                }
+                else {
+                    
+                    Image(systemName: "person.circle")
+                        .padding(.bottom, 5.0)
+                        .font(.system(size: 100.0))
+                    
                     Text("Not Logged In")
+                    
                     Button {
                         viewModel.menuIsPresented = true
                     } label: {
@@ -43,18 +66,6 @@ struct Profile: View {
                             .foregroundColor(.blue)
                     }
                     
-                }
-                else {
-                    Image(systemName: "person.circle")
-                        .padding(.bottom, 5.0)
-                        .font(.system(size: 100.0))
-                    Text("Signed in as user: [temp]")
-                    Button {
-                        self.authenticationStatus = .unauthenticated
-                    } label: {
-                        Text("Sign Out")
-                            .foregroundColor(.blue)
-                    }
                 }
                 
             }
@@ -81,4 +92,5 @@ struct Profile: View {
 
 #Preview {
     Profile()
+        .environmentObject(AuthViewModel())
 }

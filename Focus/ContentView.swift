@@ -22,24 +22,30 @@ struct ContentView: View {
         case profile
     }
     
+    // for account auth
+    @StateObject private var viewModel = AuthViewModel()
+    
     @State var selectedTab: Tabs = .home
     
     var body: some View {
         
         TabView(selection: $selectedTab) {
             Leaderboard()
+                .environmentObject(viewModel)
                 .tabItem {
                     Image(systemName: "trophy.fill")
                     Text("Leaderboard")
                 }
                 .tag(Tabs.leaderboard)
             Home()
+                .environmentObject(viewModel)
                 .tabItem {
                     Image(systemName: "house.fill")
                     Text("Home")
                 }
                 .tag(Tabs.home)
             Profile()
+                .environmentObject(viewModel)
                 .tabItem {
                     Image(systemName: "person.circle")
                     Text("Profile")

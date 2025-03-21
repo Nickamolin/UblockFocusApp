@@ -29,7 +29,7 @@ struct LoginView: View {
     
     var body: some View {
         VStack {
-            Text("Create Account View")
+            Text("Login View")
                 .font(.title)
                 .padding(.bottom, 20.0)
             
@@ -74,7 +74,7 @@ struct LoginView: View {
             Button {
                 loginWithEmailPassword()
             } label: {
-                Text("Create Account")
+                Text("Login")
             }
             .padding(.all, 20.0)
             .buttonStyle(.borderedProminent)
@@ -83,6 +83,8 @@ struct LoginView: View {
                 Text("Don't have an account? ")
                 Button {
                     viewModel.currentMenuType = .createAccount
+                    viewModel.errorMessage = ""
+                    viewModel.resetInputs()
                 } label: {
                     Text("Create Account")
                         .foregroundColor(.blue)

@@ -15,6 +15,8 @@ struct friend: Identifiable {
 
 struct Leaderboard: View {
     
+    @EnvironmentObject var viewModel: AuthViewModel
+    
     @State var friends: [friend] = [
         friend(name: "Paul", screenTime: 3),
         friend(name: "Duncan", screenTime: 5),
@@ -28,6 +30,10 @@ struct Leaderboard: View {
         NavigationStack {
             
             VStack {
+                
+                if viewModel.user != nil {
+                    Text("Signed in as \(viewModel.displayName)")
+                }
                 
                 ForEach(friends) { person in
                     friendView(inputFriend: person)
@@ -72,4 +78,5 @@ struct friendView: View {
 
 #Preview {
     Leaderboard()
+        .environmentObject(AuthViewModel())
 }

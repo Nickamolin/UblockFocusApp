@@ -12,6 +12,8 @@ import FirebaseCore
 
 struct Home: View {
     
+    @EnvironmentObject var viewModel: AuthViewModel
+    
     // Setting Restricted Apps
     @State var isPresented = false
     @State var selection = FamilyActivitySelection()
@@ -28,42 +30,56 @@ struct Home: View {
     var body: some View {
         
         NavigationStack {
+            
+            Spacer()
+            
             VStack {
-                
-                Spacer()
                 
                 Image("lock")
                     .resizable()
-                    .padding(.bottom, 30.0)
+                    .padding(.bottom, 5.0)
                     .frame(width: 200, height: 200)
                     .aspectRatio(contentMode: .fit)
                 
-                Button("Set Restricted Apps") {
-                    isPresented = true
+                if viewModel.user != nil {
+                    Text(viewModel.displayName)
+                        .padding(.bottom, 30.0)
                 }
-                .familyActivityPicker(isPresented: $isPresented, selection: $selection)
-                .padding(.bottom, 5.0)
-                .buttonStyle(.bordered)
                 
-                
-                Button("Set Goals") {
-                    /*@START_MENU_TOKEN@*//*@PLACEHOLDER=Action@*/ /*@END_MENU_TOKEN@*/
-                    //empty for now
+                VStack {
+                    
+                    Button("Set Restricted Apps") {
+                        isPresented = true
+                    }
+                    .familyActivityPicker(isPresented: $isPresented, selection: $selection)
+                    .padding(.bottom, 5.0)
+                    .buttonStyle(.bordered)
+                    
+                    Button("Set Goals") {
+                        /*@START_MENU_TOKEN@*//*@PLACEHOLDER=Action@*/ /*@END_MENU_TOKEN@*/
+                        //empty for now
+                    }
+                    .buttonStyle(.bordered)
+                    .padding(.bottom, 5.0)
+                    
+                    
+                    Button(blockingButtonText) {
+                        toggleBlocking()
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .accentColor(blockButtonColor)
+                    .padding(.bottom, 5.0)
+                    
                 }
-                .buttonStyle(.bordered)
-                .padding(.bottom, 5.0)
-                
-                Button(blockingButtonText) {
-                    toggleBlocking()
-                }
-                .buttonStyle(.borderedProminent)
-                .accentColor(blockButtonColor)
-                .padding(.bottom, 5.0)
-                
-                Spacer()
             }
             .padding()
+            .background(Rectangle()
+                .foregroundColor(Color.gray.opacity(0.3))
+                .cornerRadius(15))
+            .padding()
             .navigationTitle(Text("Home"))
+            
+            Spacer()
         }
         .onAppear {
             Task {

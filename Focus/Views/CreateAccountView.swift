@@ -98,6 +98,8 @@ struct CreateAccountView: View {
                 Text("Already have an account? ")
                 Button {
                     viewModel.currentMenuType = .login
+                    viewModel.errorMessage = ""
+                    viewModel.resetInputs()
                 } label: {
                     Text("Login")
                         .foregroundColor(.blue)

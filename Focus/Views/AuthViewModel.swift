@@ -34,14 +34,45 @@ class AuthViewModel: ObservableObject {
     @Published var user: User?
     
     @Published var displayName = ""
+    
+    init() {
+        registerAuthStateHandler()
+    }
+    
+    private var authStateHandle: AuthStateDidChangeListenerHandle?
+    
+    func registerAuthStateHandler() {
+        if authStateHandle == nil {
+            authStateHandle = Auth.auth().addStateDidChangeListener { auth, user in
+                self.user = user
+                self.authenticationState = user == nil ? .unauthenticated : .authenticated
+                self.displayName = user?.email ?? "(unknown)"
+            }
+        }
+    }
+    
+    func resetInputs() {
+        email = ""
+        password = ""
+        confirmPassword = ""
+    }
 }
 
 extension AuthViewModel {
     func signInWithEmailPassword() async -> Bool {
         authenticationState = .authenticating
         
-        authenticationState = .authenticated
-        return true
+        do {
+            let authResult = try await Auth.auth().signIn(withEmail: email, password: password)
+            user = authResult.user
+            print("User \(authResult.user.uid) signed in")
+            errorMessage = ""
+            return true
+        } catch {
+            print(error)
+            errorMessage = error.localizedDescription
+            return false
+        }
     }
     
     func createAccountWithEmailPassword() async -> Bool {
@@ -49,7 +80,6 @@ extension AuthViewModel {
         
         if (password != confirmPassword) {
             errorMessage = "Passwords do not match."
-            authenticationState = .unauthenticated
             return false
         }
         
@@ -57,23 +87,33 @@ extension AuthViewModel {
             let authResult = try await Auth.auth().createUser(withEmail: email, password: password)
             user = authResult.user
             print("User \(authResult.user.uid) signed in")
-            authenticationState = .authenticated
-            displayName = user?.email ?? "(unknown)"
+            errorMessage = ""
             return true
         } catch {
             print(error)
             errorMessage = error.localizedDescription
-            authenticationState = .unauthenticated
             return false
         }
     }
     
     func signOut() {
-        authenticationState = .unauthenticated
+        do {
+            try Auth.auth().signOut()
+            errorMessage = ""
+        } catch {
+            errorMessage = error.localizedDescription
+        }
     }
     
     func deleteAccount() async -> Bool {
-        authenticationState = .unauthenticated
-        return true
+        do {
+            try await user?.delete()
+            errorMessage = ""
+            return true
+        }
+        catch {
+            errorMessage = error.localizedDescription
+            return false
+        }
     }
 }
