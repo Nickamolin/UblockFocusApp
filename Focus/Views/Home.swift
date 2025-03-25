@@ -35,7 +35,7 @@ struct Home: View {
             
             VStack {
                 
-                Image("lock")
+                Image("lock2")
                     .resizable()
                     .padding(.bottom, 5.0)
                     .frame(width: 200, height: 200)
