@@ -27,6 +27,10 @@ struct Home: View {
     @State var blockingButtonText: String = "Off"
     @State var blockButtonColor: Color = .green
     
+    //Time Selection
+    @State private var startTime = Date()
+    @State private var endTime = Date()
+    
     var body: some View {
         
         NavigationStack {
@@ -37,7 +41,6 @@ struct Home: View {
                 
                 Image("lock2")
                     .resizable()
-                    .padding(.bottom, 5.0)
                     .frame(width: 200, height: 200)
                     .aspectRatio(contentMode: .fit)
                 
@@ -51,24 +54,66 @@ struct Home: View {
                     Button("Set Restricted Apps") {
                         isPresented = true
                     }
+                    .foregroundColor(.white)
                     .familyActivityPicker(isPresented: $isPresented, selection: $selection)
-                    .padding(.bottom, 5.0)
-                    .buttonStyle(.bordered)
+                    .padding(.all, 5.0)
+                    .frame(width: 200, height: 30)
+                    .background(Rectangle()
+                        .foregroundColor(Color.gray.opacity(0.3))
+                        .cornerRadius(7))
                     
                     Button("Set Goals") {
                         /*@START_MENU_TOKEN@*//*@PLACEHOLDER=Action@*/ /*@END_MENU_TOKEN@*/
                         //empty for now
                     }
-                    .buttonStyle(.bordered)
-                    .padding(.bottom, 5.0)
+                    .foregroundColor(.white)
+                    .padding(.all, 5.0)
+                    .frame(width: 200, height: 30)
+                    .background(Rectangle()
+                        .foregroundColor(Color.gray.opacity(0.3))
+                        .cornerRadius(7))
                     
                     
                     Button(blockingButtonText) {
                         toggleBlocking()
                     }
-                    .buttonStyle(.borderedProminent)
-                    .accentColor(blockButtonColor)
-                    .padding(.bottom, 5.0)
+                    .foregroundColor(.white)
+                    .padding(.all, 5.0)
+                    .frame(width: 200, height: 30)
+                    .background(Rectangle()
+                        .foregroundColor(blockButtonColor)
+                        .cornerRadius(7))
+                    
+                }
+                .padding(.all, 10.0)
+                
+                VStack {
+                    
+                    Text("Schedule:")
+                        .font(.headline)
+                    
+                    DateControls()
+                    
+                    // Time Controls
+                    VStack {
+                        
+                        // Time Controls
+                        HStack {
+                            DatePicker(
+                                "From: ",
+                                selection: $startTime,
+                                displayedComponents: .hourAndMinute
+                            )
+                        }
+                        HStack {
+                            DatePicker(
+                                "To: ",
+                                selection: $endTime,
+                                displayedComponents: .hourAndMinute
+                            )
+                        }
+                    }
+                    .padding(.all, 10.0)
                     
                 }
             }
@@ -110,6 +155,37 @@ struct Home: View {
         }
         
         print(blockingButtonText)
+    }
+}
+
+struct DateControls: View {
+    
+    var body: some View {
+        
+        HStack {
+            
+            Image(systemName: "s.circle")
+                .font(.system(size: 20.0))
+            Image(systemName: "m.circle.fill")
+                .font(.system(size: 20.0))
+                .foregroundColor(.blue)
+            Image(systemName: "t.circle.fill")
+                .font(.system(size: 20.0))
+                .foregroundColor(.blue)
+            Image(systemName: "w.circle.fill")
+                .font(.system(size: 20.0))
+                .foregroundColor(.blue)
+            Image(systemName: "t.circle")
+                .font(.system(size: 20.0))
+            Image(systemName: "f.circle.fill")
+                .font(.system(size: 20.0))
+                .foregroundColor(.blue)
+            Image(systemName: "s.circle")
+                .font(.system(size: 20.0))
+            
+        }
+        .padding(.all, 10.0)
+        
     }
 }
 

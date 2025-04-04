@@ -107,6 +107,7 @@ struct CreateAccountView: View {
             }
             
         }
+        .padding(.horizontal, 10.0)
     }
 }
 

@@ -8,8 +8,16 @@
 import SwiftUI
 import FirebaseAnalytics
 
+struct friendRequest: Identifiable {
+    let id = UUID()
+    var name: String
+    var incoming: Bool
+    var accepted: Bool
+}
+
 struct Profile: View {
     
+    // auth
     @EnvironmentObject var viewModel: AuthViewModel
     
     private func deleteAccount() {
@@ -18,10 +26,18 @@ struct Profile: View {
         }
     }
     
+    // friend requests
+    @State var userFriendRequests: [friendRequest] = [
+        friendRequest(name: "Paul", incoming: true, accepted: false),
+        friendRequest(name: "Duncan", incoming: true, accepted: false),
+        friendRequest(name: "Leto", incoming: false, accepted: false),
+    ]
+    
+    // view
     var body: some View {
         NavigationStack {
             VStack {
-                if viewModel.authenticationState == .authenticated {
+                if viewModel.authenticationState == .authenticated || true {
                     
                     Image(systemName: "person.circle")
                         .padding(.bottom, 5.0)
@@ -50,6 +66,46 @@ struct Profile: View {
                                 .foregroundStyle(.red)
                         }
                     }
+                    
+                    // friend requests:/
+                    VStack {
+                        Divider()
+                        
+                        Text("Friend Requests:")
+                            .fontWeight(.bold)
+                        
+                        ScrollView {
+                            // outgoing friend requests
+                            VStack {
+                                Text("Outgoing: ")
+                                
+                                
+                                ForEach(userFriendRequests) { request in
+                                    if request.incoming == false {
+                                        friendRequestView(inputFriendRequest: request)
+                                    }
+                                }
+                                
+                            }
+                            .padding(.top, 5.0)
+                            
+                            // incoming friend requests
+                            VStack {
+                                Text("Incoming: ")
+                                
+                                
+                                ForEach(userFriendRequests) { request in
+                                    if request.incoming == true {
+                                        friendRequestView(inputFriendRequest: request)
+                                    }
+                                }
+                                
+                            }
+                            .padding(.top, 5.0)
+                        }
+                    }
+                    .padding(.top, 10.0)
+                    
                 }
                 else {
                     
@@ -87,6 +143,55 @@ struct Profile: View {
             }
         }
         
+    }
+}
+
+struct friendRequestView: View {
+    
+    var inputFriendRequest: friendRequest
+    
+    var body: some View {
+        HStack {
+            HStack {
+                Image(systemName: "person.circle")
+                    .font(.system(size: 20.0))
+                Text(inputFriendRequest.name)
+            }
+            
+            Spacer()
+            
+            HStack {
+                if inputFriendRequest.incoming {
+                    Button {
+                        //implement
+                    } label: {
+                        Image(systemName: "person.fill.checkmark")
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .accentColor(.green)
+                    
+                    Button {
+                        //implement
+                    } label: {
+                        Image(systemName: "person.fill.xmark")
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .accentColor(.red)
+                }
+                else {
+                    Image(systemName: "person.crop.circle.badge.questionmark")
+                    Text("Pending")
+                        .padding(.trailing, 9.0)
+                }
+            }
+            .padding(.horizontal, 5.0)
+            
+        }
+        .padding(.all, 5.0)
+        .background(Rectangle()
+            .foregroundColor(Color.gray.opacity(0.3))
+            .cornerRadius(15))
+        .padding(.bottom, 5.0)
     }
 }
 
