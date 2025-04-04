@@ -104,6 +104,8 @@ struct Home: View {
                                 selection: $startTime,
                                 displayedComponents: .hourAndMinute
                             )
+                            .frame(width: 200.0, height: 30.0)
+                            .padding(.all, 5.0)
                         }
                         HStack {
                             DatePicker(
@@ -111,6 +113,8 @@ struct Home: View {
                                 selection: $endTime,
                                 displayedComponents: .hourAndMinute
                             )
+                            .frame(width: 200.0, height: 30.0)
+                            .padding(.all, 5.0)
                         }
                     }
                     .padding(.all, 10.0)
