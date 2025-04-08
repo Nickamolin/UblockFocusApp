@@ -43,7 +43,17 @@ struct Leaderboard: View {
                 Spacer()
             }
             .padding()
-            .navigationTitle(Text("Leaderboard"))
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    HStack {
+                        Image("lock2")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 50, height: 50)
+                        Text("Leaderboard").font(.title).fontWeight(.bold)
+                    }
+                }
+            }
         }
     }
 }

@@ -42,6 +42,14 @@
 		6BB100412D75551200AB5E19 /* Focus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Focus.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		6BDE63372DA46825006140E5 /* DataModels */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = DataModels;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
 		6BB1003E2D75551200AB5E19 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
@@ -70,6 +78,7 @@
 		6B78856C2D88BA8E00F78D59 /* Focus */ = {
 			isa = PBXGroup;
 			children = (
+				6BDE63372DA46825006140E5 /* DataModels */,
 				6B7885722D88BAFF00F78D59 /* Views */,
 				6B7885662D88BA8E00F78D59 /* Preview Content */,
 				6B7885672D88BA8E00F78D59 /* Assets.xcassets */,
@@ -124,6 +133,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				6BDE63372DA46825006140E5 /* DataModels */,
 			);
 			name = Focus;
 			packageProductDependencies = (
@@ -339,6 +351,7 @@
 				DEVELOPMENT_TEAM = 8X5B8275Z9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = UBlock;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -369,6 +382,7 @@
 				DEVELOPMENT_TEAM = 8X5B8275Z9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = UBlock;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

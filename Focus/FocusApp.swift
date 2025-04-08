@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 import FirebaseCore
 import FirebaseAuth
 
@@ -30,5 +31,6 @@ struct FocusApp: App {
         WindowGroup {
             ContentView()
         }
+        .modelContainer(for: Goal.self)
     }
 }

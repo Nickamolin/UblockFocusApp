@@ -37,7 +37,7 @@ struct Profile: View {
     var body: some View {
         NavigationStack {
             VStack {
-                if viewModel.authenticationState == .authenticated || true {
+                if viewModel.authenticationState == .authenticated {
                     
                     Image(systemName: "person.circle")
                         .padding(.bottom, 5.0)
@@ -126,7 +126,20 @@ struct Profile: View {
                 
             }
             .padding()
-            .navigationTitle(Text("Profile"))
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    
+                }
+                ToolbarItem(placement: .topBarLeading) {
+                    HStack {
+                        Image("lock2")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 50, height: 50)
+                        Text("Profile").font(.title).fontWeight(.bold)
+                    }
+                }
+            }
             .sheet(isPresented: $viewModel.menuIsPresented) {
                 if viewModel.currentMenuType == .login {
                     

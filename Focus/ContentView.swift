@@ -12,6 +12,9 @@ import FirebaseCore
 
 struct ContentView: View {
     
+    // for persistent local data
+    @Environment(\.modelContext) private var context
+    
     // needed for access to screen time api
     let center = AuthorizationCenter.shared
     
@@ -39,6 +42,7 @@ struct ContentView: View {
                 .tag(Tabs.leaderboard)
             Home()
                 .environmentObject(viewModel)
+                .modelContainer(for: Goal.self)
                 .tabItem {
                     Image(systemName: "house.fill")
                     Text("Home")
