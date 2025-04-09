@@ -52,13 +52,13 @@ struct Home: View {
 //                    .frame(width: 200, height: 200)
 //                    .aspectRatio(contentMode: .fit)
                 
-                if viewModel.user != nil {
-                    Text("Logged in as \(viewModel.displayName)")
-                        .padding(.bottom, 30.0)
-                }
+//                if viewModel.user != nil {
+//                    Text("Logged in as \(viewModel.displayName)")
+//                        .padding(.bottom, 30.0)
+//                }
                 
                 VStack {
-                    Divider()
+                    //Divider()
                     HStack {
                         Text("Distracting Apps")
                             .font(.headline)
@@ -76,8 +76,11 @@ struct Home: View {
                         Text("No Apps Selected").opacity(0.3)
                     }
                     else {
-                        ForEach(selection.applications.sorted(by: {$0.localizedDisplayName ?? "" < $1.localizedDisplayName ?? ""}), id: \.hashValue) { app in
-                            Text(app.bundleIdentifier ?? "")
+                        ForEach(selection.applicationTokens.sorted(by: {$0.hashValue < $1.hashValue}), id: \.hashValue) { app in
+                            HStack {
+                                Label(app)
+                                Spacer()
+                            }
                         }
                     }
                     
@@ -103,12 +106,15 @@ struct Home: View {
                     }
                     else {
                         ForEach(goals) { goal in
-                            Text(goal.name)
+                            HStack {
+                                Text("- \(goal.name)")
+                                Spacer()
+                            }
                         }
                     }
                     
                 }
-                .padding(.all, 10.0)
+                .padding(.horizontal, 10.0)
                 
                 VStack {
                     
@@ -159,7 +165,7 @@ struct Home: View {
                             .foregroundColor(blockButtonColor)
                             .cornerRadius(7))
                     }
-                    .padding(.all, 10.0)
+                    .padding(.horizontal, 10.0)
                     
                 }
             }
