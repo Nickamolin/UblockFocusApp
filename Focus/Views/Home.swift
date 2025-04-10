@@ -9,7 +9,7 @@ import SwiftUI
 import SwiftData
 import FamilyControls
 import ManagedSettings
-import FirebaseCore
+//import FirebaseCore
 
 struct Home: View {
     
@@ -23,6 +23,8 @@ struct Home: View {
     @State var isPickerPresented = false
     @State var selection = FamilyActivitySelection()
     @State var appsToBlock: [Application] = []
+    
+    @Query private var distractingApps: [DistractingApps]
     
     let store = ManagedSettingsStore()
     let center = AuthorizationCenter.shared
@@ -68,17 +70,25 @@ struct Home: View {
                         Button("Edit") {
                             isPickerPresented = true
                         }
-                        .familyActivityPicker(isPresented: $isPickerPresented, selection: $selection)
+//                        .familyActivityPicker(isPresented: $isPickerPresented, selection: $selection)
+                        .sheet(isPresented: $isPickerPresented, onDismiss: {print("Dismissed")}, content: {
+                            EditDistractingAppsView(isPresented: $isPickerPresented)
+                                .modelContainer(for: [Goal.self, DistractingApps.self])
+                        })
                         .padding(.horizontal, 5.0)
                     }
                     
                     Divider()
                     
-                    if selection.applications.isEmpty {
-                        Text("No Apps Selected").opacity(0.3)
-                    }
-                    else {
-                        ForEach(selection.applicationTokens.sorted(by: {$0.hashValue < $1.hashValue}), id: \.hashValue) { app in
+//                    if selection.applications.isEmpty {
+                    if !distractingApps.isEmpty {
+                        if distractingApps.first!.selection.isEmpty {
+                            Text("No Apps Selected").opacity(0.3)
+                        }
+                        else {
+                            
+                        }
+                        ForEach(distractingApps.first!.selection.sorted(by: {$0.hashValue < $1.hashValue}), id: \.hashValue) { app in
                             HStack {
                                 Label(app)
                                 Spacer()
@@ -104,7 +114,7 @@ struct Home: View {
                         }
                         .sheet(isPresented: $isGoalPickerPresented, onDismiss: {print("Dismissed")}, content: {
                             EditGoalsView(isPresented: $isGoalPickerPresented)
-                                .modelContainer(for: Goal.self)
+                                .modelContainer(for: [Goal.self, DistractingApps.self])
                         })
                         .padding(.horizontal, 5.0)
                     }
@@ -203,6 +213,17 @@ struct Home: View {
             
         }
         .onAppear {
+            
+//            if distractingApps.isEmpty {
+//                context.insert(DistractingApps(selection: Set<ApplicationToken>()))
+//            }
+            
+            if distractingApps.isEmpty {
+                context.insert(DistractingApps(selection: Set<ApplicationToken>()))
+                
+                try? self.context.save()
+            }
+            
             Task {
                 do {
                     try await center.requestAuthorization(for: .individual)
@@ -231,6 +252,58 @@ struct Home: View {
         }
         
         print(blockingButtonText)
+    }
+}
+
+struct EditDistractingAppsView: View {
+    
+    @Environment(\.modelContext) private var context
+    @Binding var isPresented: Bool
+    @Query private var distractingApps: [DistractingApps]
+    
+    @State var selection = FamilyActivitySelection()
+    
+    var body: some View {
+        NavigationStack {
+            VStack {
+                FamilyActivityPicker(selection: $selection)
+            }
+            .navigationTitle(Text("Choose Apps"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel") {
+                        isPresented = false
+                    }
+                    .foregroundColor(.blue)
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") {
+                        
+                        if distractingApps.isEmpty {
+                            context.insert(DistractingApps(selection: selection.applicationTokens))
+                            
+                            try? self.context.save()
+                        }
+                        else {
+                            distractingApps.first?.selection = selection.applicationTokens
+                            
+                            try? self.context.save()
+                        }
+                        
+                        
+                        isPresented = false
+                    }
+                    .foregroundColor(.blue)
+                    .font(.headline)
+                }
+            }
+        }
+        .onAppear {
+            if !distractingApps.isEmpty {
+                selection.applicationTokens = distractingApps.first!.selection
+            }
+        }
     }
 }
 

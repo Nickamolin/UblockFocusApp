@@ -31,6 +31,6 @@ struct FocusApp: App {
         WindowGroup {
             ContentView()
         }
-        .modelContainer(for: Goal.self)
+        .modelContainer(for: [Goal.self, DistractingApps.self])
     }
 }

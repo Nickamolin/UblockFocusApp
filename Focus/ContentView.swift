@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 import FamilyControls
 import ManagedSettings
 //import FirebaseCore
@@ -14,6 +15,8 @@ struct ContentView: View {
     
     // for persistent local data
     @Environment(\.modelContext) private var context
+    
+    @Query var distractingApps: [DistractingApps]
     
     // needed for access to screen time api
     let center = AuthorizationCenter.shared
@@ -57,8 +60,15 @@ struct ContentView: View {
 //                .tag(Tabs.profile)
 //        }
         Home()
-        .modelContainer(for: Goal.self)
+        .modelContainer(for: [Goal.self, DistractingApps.self])
         .onAppear {
+            
+            if distractingApps.isEmpty {
+                self.context.insert(DistractingApps(selection: Set<ApplicationToken>()))
+                
+                try? self.context.save()
+            }
+            
             Task {
                 do {
                     try await center.requestAuthorization(for: .individual)
