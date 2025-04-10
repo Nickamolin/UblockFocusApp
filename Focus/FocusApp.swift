@@ -7,13 +7,13 @@
 
 import SwiftUI
 import SwiftData
-import FirebaseCore
-import FirebaseAuth
+//import FirebaseCore
+//import FirebaseAuth
 
 class AppDelegate: NSObject, UIApplicationDelegate {
   func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-    FirebaseApp.configure()
+//    FirebaseApp.configure()
       
     // for local emulation
     //Auth.auth().useEmulator(withHost: "localhost", port: 9099)
@@ -25,7 +25,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 @main
 struct FocusApp: App {
     // register app delegate for Firebase setup
-      @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+      //@UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     
     var body: some Scene {
         WindowGroup {

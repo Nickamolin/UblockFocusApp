@@ -45,17 +45,17 @@ struct Home: View {
         
         NavigationStack {
             
-            VStack {
+            ScrollView {
                 
-//                Image("lock2")
-//                    .resizable()
-//                    .frame(width: 200, height: 200)
-//                    .aspectRatio(contentMode: .fit)
+                Image("lock2")
+                    .resizable()
+                    .frame(width: 200, height: 200)
+                //                    .aspectRatio(contentMode: .fit)
                 
-//                if viewModel.user != nil {
-//                    Text("Logged in as \(viewModel.displayName)")
-//                        .padding(.bottom, 30.0)
-//                }
+                //                if viewModel.user != nil {
+                //                    Text("Logged in as \(viewModel.displayName)")
+                //                        .padding(.bottom, 30.0)
+                //                }
                 
                 VStack {
                     //Divider()
@@ -69,8 +69,10 @@ struct Home: View {
                             isPickerPresented = true
                         }
                         .familyActivityPicker(isPresented: $isPickerPresented, selection: $selection)
-                        .padding(.all, 5.0)
+                        .padding(.horizontal, 5.0)
                     }
+                    
+                    Divider()
                     
                     if selection.applications.isEmpty {
                         Text("No Apps Selected").opacity(0.3)
@@ -83,8 +85,14 @@ struct Home: View {
                             }
                         }
                     }
-                    
-                    Divider()
+                }
+                .padding()
+                .background(Rectangle()
+                    .foregroundColor(Color.gray.opacity(0.3))
+                    .cornerRadius(15))
+                .padding(.all , 5.0)
+                
+                VStack {
                     HStack {
                         Text("Productive Alternatives")
                             .font(.headline)
@@ -98,28 +106,33 @@ struct Home: View {
                             EditGoalsView(isPresented: $isGoalPickerPresented)
                                 .modelContainer(for: Goal.self)
                         })
-                        .padding(.all, 5.0)
+                        .padding(.horizontal, 5.0)
                     }
+                    
+                    Divider()
                     
                     if goals.isEmpty {
                         Text("No Goals Set").opacity(0.3)
                     }
                     else {
-                        ForEach(goals) { goal in
+                        ForEach(goals.sorted(by: { $0.listIndex < $1.listIndex })) { goal in
                             HStack {
-                                Text("- \(goal.name)")
+                                Image(systemName: "circlebadge.fill")
+                                Text(goal.name)
+//                                Text("- \(goal.name)")
                                 Spacer()
-                            }
+                            }.padding(.all, 2.0)
                         }
                     }
                     
                 }
-                .padding(.horizontal, 10.0)
+                .padding()
+                .background(Rectangle()
+                    .foregroundColor(Color.gray.opacity(0.3))
+                    .cornerRadius(15))
+                .padding(.all , 5.0)
                 
                 VStack {
-                    
-                    Divider()
-                    
                     HStack {
                         
                         Text("Schedule:")
@@ -128,7 +141,9 @@ struct Home: View {
                         Spacer()
                         
                     }
-                    .padding(.horizontal, 10.0)
+                    .padding(.horizontal, 5.0)
+                    
+                    Divider()
                     
                     DateControls()
                     
@@ -168,23 +183,23 @@ struct Home: View {
                     .padding(.horizontal, 10.0)
                     
                 }
+                .padding()
+                .background(Rectangle()
+                    .foregroundColor(Color.gray.opacity(0.3))
+                    .cornerRadius(15))
+                .padding(.all , 5.0)
             }
-            .padding()
-            .background(Rectangle()
-                .foregroundColor(Color.gray.opacity(0.3))
-                .cornerRadius(15))
-            .padding()
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    HStack {
-                        Image("lock2")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 50, height: 50)
-                        Text("Home").font(.title).fontWeight(.bold)
-                    }
-                }
-            }
+//            .toolbar {
+//                ToolbarItem(placement: .topBarLeading) {
+//                    HStack {
+//                        Image("lock2")
+//                            .resizable()
+//                            .aspectRatio(contentMode: .fit)
+//                            .frame(width: 50, height: 50)
+//                        Text("Home").font(.title).fontWeight(.bold)
+//                    }
+//                }
+//            }
             
         }
         .onAppear {
@@ -225,14 +240,12 @@ struct EditGoalsView: View {
     @Binding var isPresented: Bool
     @Query private var goals: [Goal]
     
-    @State var goalsToDelete: [Goal] = []
-    
     var body: some View {
         NavigationStack {
             VStack {
                 
                 List {
-                    ForEach(goals) { goal in
+                    ForEach(goals.sorted(by: { $0.listIndex < $1.listIndex })) { goal in
                         EditGoalCell(goalToEdit: goal)
                     }
                     .onDelete { indexSet in
@@ -240,18 +253,16 @@ struct EditGoalsView: View {
                             context.delete(goals[index])
                         }
                     }
-                    if goals.count < 5 {
+                    if goals.count < 15 {
                         HStack {
                             Spacer()
                             Button("[+]") {
                                 
-                                context.insert(Goal(name: ""))
+                                context.insert(Goal(name: "", listIndex: goals.count))
                                 
-                                try? self.context.save()
                             }
                             Spacer()
                         }
-                        
                     }
                 }
             }
@@ -266,6 +277,11 @@ struct EditGoalsView: View {
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") {
+                        for goal in goals {
+                            if goal.name.isEmpty {
+                                self.context.delete(goal)
+                            }
+                        }
                         try? self.context.save()
                         isPresented = false
                     }

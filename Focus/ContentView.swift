@@ -8,7 +8,7 @@
 import SwiftUI
 import FamilyControls
 import ManagedSettings
-import FirebaseCore
+//import FirebaseCore
 
 struct ContentView: View {
     
@@ -26,36 +26,38 @@ struct ContentView: View {
     }
     
     // for account auth
-    @StateObject private var viewModel = AuthViewModel()
+//    @StateObject private var viewModel = AuthViewModel()
     
-    @State var selectedTab: Tabs = .home
+//    @State var selectedTab: Tabs = .home
     
     var body: some View {
         
-        TabView(selection: $selectedTab) {
-            Leaderboard()
-                .environmentObject(viewModel)
-                .tabItem {
-                    Image(systemName: "trophy.fill")
-                    Text("Leaderboard")
-                }
-                .tag(Tabs.leaderboard)
-            Home()
-                .environmentObject(viewModel)
-                .modelContainer(for: Goal.self)
-                .tabItem {
-                    Image(systemName: "house.fill")
-                    Text("Home")
-                }
-                .tag(Tabs.home)
-            Profile()
-                .environmentObject(viewModel)
-                .tabItem {
-                    Image(systemName: "person.circle")
-                    Text("Profile")
-                }
-                .tag(Tabs.profile)
-        }
+//        TabView(selection: $selectedTab) {
+//            Leaderboard()
+//                .environmentObject(viewModel)
+//                .tabItem {
+//                    Image(systemName: "trophy.fill")
+//                    Text("Leaderboard")
+//                }
+//                .tag(Tabs.leaderboard)
+//            Home()
+//                .environmentObject(viewModel)
+//                .modelContainer(for: Goal.self)
+//                .tabItem {
+//                    Image(systemName: "house.fill")
+//                    Text("Home")
+//                }
+//                .tag(Tabs.home)
+//            Profile()
+//                .environmentObject(viewModel)
+//                .tabItem {
+//                    Image(systemName: "person.circle")
+//                    Text("Profile")
+//                }
+//                .tag(Tabs.profile)
+//        }
+        Home()
+        .modelContainer(for: Goal.self)
         .onAppear {
             Task {
                 do {
