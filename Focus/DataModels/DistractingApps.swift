@@ -13,11 +13,13 @@ import ManagedSettings
 class DistractingApps: Identifiable {
     
     var id: String
-    var selection: Set<ApplicationToken>
+    var selectionTokens: Set<ApplicationToken>
+    //var selectionApps: Set<Application>
     
-    init(selection: Set<ApplicationToken>) {
+    init(selectionTokens: Set<ApplicationToken>) {
         
         self.id = UUID().uuidString
-        self.selection = selection
+        self.selectionTokens = selectionTokens
+        //self.selectionApps = selectionApps
     }
 }

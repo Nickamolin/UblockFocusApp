@@ -17,6 +17,7 @@ struct ContentView: View {
     @Environment(\.modelContext) private var context
     
     @Query var distractingApps: [DistractingApps]
+    @Query var schedules: [Schedule]
     
     // needed for access to screen time api
     let center = AuthorizationCenter.shared
@@ -60,11 +61,17 @@ struct ContentView: View {
 //                .tag(Tabs.profile)
 //        }
         Home()
-        .modelContainer(for: [Goal.self, DistractingApps.self])
+            .modelContainer(for: [Goal.self, DistractingApps.self, Schedule.self])
         .onAppear {
             
             if distractingApps.isEmpty {
-                self.context.insert(DistractingApps(selection: Set<ApplicationToken>()))
+                self.context.insert(DistractingApps(selectionTokens: Set<ApplicationToken>()))
+                
+                try? self.context.save()
+            }
+            
+            if schedules.isEmpty {
+                self.context.insert(Schedule(from: Date(), to: Date()))
                 
                 try? self.context.save()
             }

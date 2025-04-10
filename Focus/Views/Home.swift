@@ -9,7 +9,48 @@ import SwiftUI
 import SwiftData
 import FamilyControls
 import ManagedSettings
+import DeviceActivity
+import ManagedSettingsUI
 //import FirebaseCore
+
+// **********
+extension DeviceActivityName {
+    static let daily = Self("daily")
+}
+
+extension ManagedSettingsStore.Name {
+    static let ublock = Self("ublock")
+}
+
+class MyMonitor: DeviceActivityMonitor {
+    
+    @Environment(\.modelContext) private var context
+    
+    @Query var distractingApps: [DistractingApps]
+    
+    override func intervalDidStart(for activity: DeviceActivityName) {
+        super.intervalDidStart(for: activity)
+        
+        let uBlockStore = ManagedSettingsStore(named: .ublock)
+        
+        if !distractingApps.isEmpty {
+            uBlockStore.shield.applications = distractingApps.first?.selectionTokens
+        }
+        
+        print("interval started!")
+    }
+    
+    override func intervalDidEnd(for activity: DeviceActivityName) {
+        super.intervalDidEnd(for: activity)
+        
+        let uBlockStore = ManagedSettingsStore(named: .ublock)
+        
+        uBlockStore.shield.applications = nil
+        
+        print("interval ended!")
+    }
+}
+// **********
 
 struct Home: View {
     
@@ -17,17 +58,18 @@ struct Home: View {
     @Environment(\.modelContext) private var context
     
     // for auth interactions
-    @EnvironmentObject var viewModel: AuthViewModel
+//    @EnvironmentObject var viewModel: AuthViewModel
     
     // Setting Restricted Apps
-    @State var isPickerPresented = false
-    @State var selection = FamilyActivitySelection()
-    @State var appsToBlock: [Application] = []
+    //@State var isPickerPresented = false
+//    @State var selection = FamilyActivitySelection()
+//    @State var appsToBlock: [Application] = []
     
     @Query private var distractingApps: [DistractingApps]
     
     let store = ManagedSettingsStore()
-    let center = AuthorizationCenter.shared
+    let authCenter = AuthorizationCenter.shared
+    let activityCenter = DeviceActivityCenter()
     
     // On/Off Toggle Button
     @State var blockingStatus: Bool = false
@@ -43,6 +85,8 @@ struct Home: View {
     @State private var startTime = Date()
     @State private var endTime = Date()
     
+    @Query private var schedules: [Schedule]
+    
     var body: some View {
         
         NavigationStack {
@@ -52,55 +96,9 @@ struct Home: View {
                 Image("lock2")
                     .resizable()
                     .frame(width: 200, height: 200)
-                //                    .aspectRatio(contentMode: .fit)
                 
-                //                if viewModel.user != nil {
-                //                    Text("Logged in as \(viewModel.displayName)")
-                //                        .padding(.bottom, 30.0)
-                //                }
-                
-                VStack {
-                    //Divider()
-                    HStack {
-                        Text("Distracting Apps")
-                            .font(.headline)
-                        
-                        Spacer()
-                        
-                        Button("Edit") {
-                            isPickerPresented = true
-                        }
-//                        .familyActivityPicker(isPresented: $isPickerPresented, selection: $selection)
-                        .sheet(isPresented: $isPickerPresented, onDismiss: {print("Dismissed")}, content: {
-                            EditDistractingAppsView(isPresented: $isPickerPresented)
-                                .modelContainer(for: [Goal.self, DistractingApps.self])
-                        })
-                        .padding(.horizontal, 5.0)
-                    }
-                    
-                    Divider()
-                    
-//                    if selection.applications.isEmpty {
-                    if !distractingApps.isEmpty {
-                        if distractingApps.first!.selection.isEmpty {
-                            Text("No Apps Selected").opacity(0.3)
-                        }
-                        else {
-                            
-                        }
-                        ForEach(distractingApps.first!.selection.sorted(by: {$0.hashValue < $1.hashValue}), id: \.hashValue) { app in
-                            HStack {
-                                Label(app)
-                                Spacer()
-                            }
-                        }
-                    }
-                }
-                .padding()
-                .background(Rectangle()
-                    .foregroundColor(Color.gray.opacity(0.3))
-                    .cornerRadius(15))
-                .padding(.all , 5.0)
+                DistractingAppsBlock()
+                    .modelContainer(for: [Goal.self, DistractingApps.self, Schedule.self])
                 
                 VStack {
                     HStack {
@@ -114,7 +112,7 @@ struct Home: View {
                         }
                         .sheet(isPresented: $isGoalPickerPresented, onDismiss: {print("Dismissed")}, content: {
                             EditGoalsView(isPresented: $isGoalPickerPresented)
-                                .modelContainer(for: [Goal.self, DistractingApps.self])
+                                .modelContainer(for: [Goal.self, DistractingApps.self, Schedule.self])
                         })
                         .padding(.horizontal, 5.0)
                     }
@@ -129,12 +127,10 @@ struct Home: View {
                             HStack {
                                 Image(systemName: "circlebadge.fill")
                                 Text(goal.name)
-//                                Text("- \(goal.name)")
                                 Spacer()
                             }.padding(.all, 2.0)
                         }
                     }
-                    
                 }
                 .padding()
                 .background(Rectangle()
@@ -144,40 +140,26 @@ struct Home: View {
                 
                 VStack {
                     HStack {
-                        
                         Text("Schedule:")
                             .font(.headline)
                         
                         Spacer()
                         
+                        Button("Save") {
+                            saveSchedule()
+                        }
+                        .padding(.horizontal, 5.0)
                     }
-                    .padding(.horizontal, 5.0)
                     
                     Divider()
-                    
-                    DateControls()
                     
                     // Time Controls
                     VStack {
                         
-                        // Time Controls
-                        HStack {
-                            DatePicker(
-                                "From: ",
-                                selection: $startTime,
-                                displayedComponents: .hourAndMinute
-                            )
-                            .frame(width: 200.0, height: 30.0)
-                            .padding(.all, 5.0)
-                        }
-                        HStack {
-                            DatePicker(
-                                "To: ",
-                                selection: $endTime,
-                                displayedComponents: .hourAndMinute
-                            )
-                            .frame(width: 200.0, height: 30.0)
-                            .padding(.all, 5.0)
+                        if !schedules.isEmpty {
+                            // Time Controls
+                            EditTimeControlsView(scheduleToEdit: schedules.first!)
+                                .padding(.top, 5.0)
                         }
                         
                         Button(blockingButtonText) {
@@ -190,7 +172,6 @@ struct Home: View {
                             .foregroundColor(blockButtonColor)
                             .cornerRadius(7))
                     }
-                    .padding(.horizontal, 10.0)
                     
                 }
                 .padding()
@@ -214,19 +195,21 @@ struct Home: View {
         }
         .onAppear {
             
-//            if distractingApps.isEmpty {
-//                context.insert(DistractingApps(selection: Set<ApplicationToken>()))
-//            }
-            
             if distractingApps.isEmpty {
-                context.insert(DistractingApps(selection: Set<ApplicationToken>()))
+                context.insert(DistractingApps(selectionTokens: Set<ApplicationToken>()))
+                
+                try? self.context.save()
+            }
+            
+            if schedules.isEmpty {
+                self.context.insert(Schedule(from: Date(), to: Date()))
                 
                 try? self.context.save()
             }
             
             Task {
                 do {
-                    try await center.requestAuthorization(for: .individual)
+                    try await authCenter.requestAuthorization(for: .individual)
                 } catch {
                     print("Failed to enroll with error: \(error)")
                 }
@@ -242,7 +225,9 @@ struct Home: View {
             blockingButtonText = "On"
             blockButtonColor = .red
             
-            store.shield.applications = selection.applicationTokens
+            if !distractingApps.isEmpty {
+                store.shield.applications = distractingApps.first?.selectionTokens
+            }
         }
         else {
             blockingButtonText = "Off"
@@ -253,6 +238,98 @@ struct Home: View {
         
         print(blockingButtonText)
     }
+    
+    func saveSchedule() {
+        if !schedules.isEmpty {
+            
+            let testCenter = DeviceActivityCenter()
+            let monitorSchedule = DeviceActivitySchedule(
+                intervalStart: Calendar.current.dateComponents([.hour, .minute], from: schedules.first!.from),
+                intervalEnd: Calendar.current.dateComponents([.hour, .minute], from: schedules.first!.to),
+                repeats: true
+            )
+            
+            do {
+                try testCenter.startMonitoring(.daily, during: monitorSchedule)
+            } catch {
+                print("Unexpected error: \(error).")
+            }
+            
+            print(Calendar.current.dateComponents([.hour, .minute], from: schedules.first!.from))
+            
+            print(Calendar.current.dateComponents([.hour, .minute], from: schedules.first!.to))
+            
+            print("saved schedule")
+        }
+    }
+}
+
+struct DistractingAppsBlock: View {
+    @Environment(\.modelContext) private var context
+    
+    @Query private var distractingApps: [DistractingApps]
+    
+    @State var isPickerPresented = false
+    
+    var body: some View {
+        
+        VStack {
+            HStack {
+                Text("Distracting Apps")
+                    .font(.headline)
+                
+                Spacer()
+                
+                Button("Edit") {
+                    isPickerPresented = true
+                }
+                .sheet(isPresented: $isPickerPresented, onDismiss: {print("Dismissed")}, content: {
+                    EditDistractingAppsView(isPresented: $isPickerPresented)
+                        .modelContainer(for: [Goal.self, DistractingApps.self, Schedule.self])
+                })
+                .padding(.horizontal, 5.0)
+            }
+            
+            Divider()
+            
+            if !distractingApps.isEmpty {
+                if distractingApps.first!.selectionTokens.isEmpty {
+                    Text("No Apps Selected").opacity(0.3)
+                }
+                else {
+                    ForEach(distractingApps.first!.selectionTokens.sorted(by: {$0.hashValue < $1.hashValue}), id: \.hashValue) { app in
+                        HStack {
+                            Label(app)
+                            Spacer()
+                        }
+                    }
+                }
+            }
+        }
+        .padding()
+        .background(Rectangle()
+            .foregroundColor(Color.gray.opacity(0.3))
+            .cornerRadius(15))
+        .padding(.all , 5.0)
+        
+    }
+    
+}
+
+struct GoalsBlock: View {
+    
+    var body: some View {
+        
+    }
+    
+}
+
+struct ScheduleBlock: View {
+    
+    var body: some View {
+        
+    }
+    
 }
 
 struct EditDistractingAppsView: View {
@@ -265,9 +342,7 @@ struct EditDistractingAppsView: View {
     
     var body: some View {
         NavigationStack {
-            VStack {
-                FamilyActivityPicker(selection: $selection)
-            }
+            FamilyActivityPicker(selection: $selection)
             .navigationTitle(Text("Choose Apps"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -281,12 +356,13 @@ struct EditDistractingAppsView: View {
                     Button("Done") {
                         
                         if distractingApps.isEmpty {
-                            context.insert(DistractingApps(selection: selection.applicationTokens))
+                            context.insert(DistractingApps(selectionTokens: selection.applicationTokens))
                             
                             try? self.context.save()
                         }
                         else {
-                            distractingApps.first?.selection = selection.applicationTokens
+                            distractingApps.first?.selectionTokens = selection.applicationTokens
+                            //distractingApps.first?.selectionApps = selection.applications
                             
                             try? self.context.save()
                         }
@@ -301,7 +377,8 @@ struct EditDistractingAppsView: View {
         }
         .onAppear {
             if !distractingApps.isEmpty {
-                selection.applicationTokens = distractingApps.first!.selection
+                selection.applicationTokens = distractingApps.first!.selectionTokens
+                
             }
         }
     }
@@ -375,36 +452,58 @@ struct EditGoalCell: View {
     }
 }
 
-struct DateControls: View {
+struct EditTimeControlsView: View {
+    
+    @Bindable var scheduleToEdit: Schedule
     
     var body: some View {
-        
         HStack {
-            
-            Image(systemName: "s.circle")
-                .font(.system(size: 20.0))
-            Image(systemName: "m.circle.fill")
-                .font(.system(size: 20.0))
-                .foregroundColor(.blue)
-            Image(systemName: "t.circle.fill")
-                .font(.system(size: 20.0))
-                .foregroundColor(.blue)
-            Image(systemName: "w.circle.fill")
-                .font(.system(size: 20.0))
-                .foregroundColor(.blue)
-            Image(systemName: "t.circle")
-                .font(.system(size: 20.0))
-            Image(systemName: "f.circle.fill")
-                .font(.system(size: 20.0))
-                .foregroundColor(.blue)
-            Image(systemName: "s.circle")
-                .font(.system(size: 20.0))
-            
+            DatePicker(
+                "From: ",
+                selection: $scheduleToEdit.from,
+                displayedComponents: .hourAndMinute
+            )
         }
-        .padding(.all, 10.0)
-        
+        HStack {
+            DatePicker(
+                "To: ",
+                selection: $scheduleToEdit.to,
+                displayedComponents: .hourAndMinute
+            )
+        }
     }
 }
+
+//struct DateControls: View {
+//    
+//    var body: some View {
+//        
+//        HStack {
+//            
+//            Image(systemName: "s.circle")
+//                .font(.system(size: 20.0))
+//            Image(systemName: "m.circle.fill")
+//                .font(.system(size: 20.0))
+//                .foregroundColor(.blue)
+//            Image(systemName: "t.circle.fill")
+//                .font(.system(size: 20.0))
+//                .foregroundColor(.blue)
+//            Image(systemName: "w.circle.fill")
+//                .font(.system(size: 20.0))
+//                .foregroundColor(.blue)
+//            Image(systemName: "t.circle")
+//                .font(.system(size: 20.0))
+//            Image(systemName: "f.circle.fill")
+//                .font(.system(size: 20.0))
+//                .foregroundColor(.blue)
+//            Image(systemName: "s.circle")
+//                .font(.system(size: 20.0))
+//            
+//        }
+//        .padding(.all, 10.0)
+//        
+//    }
+//}
 
 #Preview {
     ContentView()
