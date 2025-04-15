@@ -17,11 +17,11 @@ import ManagedSettingsUI
 extension DeviceActivityName {
     static let daily = Self("daily")
 }
-//
-//extension ManagedSettingsStore.Name {
-//    static let ublock = Self("ublock")
-//}
-//
+
+extension ManagedSettingsStore.Name {
+    static let ublock = Self("ublock")
+}
+
 //class MyMonitor: DeviceActivityMonitor {
 //    
 //    @Environment(\.modelContext) private var context
@@ -162,14 +162,14 @@ struct Home: View {
                                 .padding(.top, 5.0)
                         }
                         
-                        Button(blockingButtonText) {
-                            toggleBlocking()
-                        }
-                        .foregroundColor(.white)
-                        .padding(.all, 10.0)
-                        .background(Rectangle()
-                            .foregroundColor(blockButtonColor)
-                            .cornerRadius(7))
+//                        Button(blockingButtonText) {
+//                            toggleBlocking()
+//                        }
+//                        .foregroundColor(.white)
+//                        .padding(.all, 10.0)
+//                        .background(Rectangle()
+//                            .foregroundColor(blockButtonColor)
+//                            .cornerRadius(7))
                     }
                     
                 }
@@ -259,6 +259,13 @@ struct Home: View {
             print(Calendar.current.dateComponents([.hour, .minute], from: schedules.first!.to))
             
             print("saved schedule")
+            
+            guard let modelContainer = try? ModelContainer(for: Goal.self, DistractingApps.self, Schedule.self) else { return }
+            let descriptor = FetchDescriptor<DistractingApps>()
+            let context = ModelContext(modelContainer)
+            let distractingApps = try? context.fetch(descriptor)
+            
+            print("for \(distractingApps?.first?.selectionTokens.count ?? 0) apps")
         }
     }
 }

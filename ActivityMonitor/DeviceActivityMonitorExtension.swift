@@ -7,12 +7,12 @@
 
 import DeviceActivity
 import SwiftData
-import _SwiftData_SwiftUI
+//import _SwiftData_SwiftUI
 import ManagedSettings
 
-//extension ManagedSettingsStore.Name {
-//    static let ublock = Self("ublock")
-//}
+extension ManagedSettingsStore.Name {
+    static let ublock = Self("ublock")
+}
 
 // Optionally override any of the functions below.
 // Make sure that your class name matches the NSExtensionPrincipalClass in your Info.plist.
@@ -21,16 +21,17 @@ class DeviceActivityMonitorExtension: DeviceActivityMonitor {
     override func intervalDidStart(for activity: DeviceActivityName) {
         super.intervalDidStart(for: activity)
         
-//        guard let modelContainer = try? ModelContainer(for: Schedule.self) else { return }
-//        let descriptor = FetchDescriptor<DistractingApps>()
-//        let context = ModelContext(modelContainer)
-//        let distractingApps = try? context.fetch(descriptor)
-//        
-//        let uBlockStore = ManagedSettingsStore(named: .ublock)
-//        
+        guard let modelContainer = try? ModelContainer(for: Goal.self, DistractingApps.self, Schedule.self) else { return }
+        let descriptor = FetchDescriptor<DistractingApps>()
+        let context = ModelContext(modelContainer)
+        let distractingApps = try? context.fetch(descriptor)
+        
+        let uBlockStore = ManagedSettingsStore(named: .ublock)
+        
 //        if !distractingApps!.isEmpty {
 //            uBlockStore.shield.applications = distractingApps?.first?.selectionTokens
 //        }
+        uBlockStore.shield.applications = distractingApps?.first?.selectionTokens
         
         print("interval started!")
         
@@ -40,9 +41,9 @@ class DeviceActivityMonitorExtension: DeviceActivityMonitor {
     override func intervalDidEnd(for activity: DeviceActivityName) {
         super.intervalDidEnd(for: activity)
         
-//        let uBlockStore = ManagedSettingsStore(named: .ublock)
-//        
-//        uBlockStore.shield.applications = nil
+        let uBlockStore = ManagedSettingsStore(named: .ublock)
+        
+        uBlockStore.shield.applications = nil
         
         print("interval ended!")
         

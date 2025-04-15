@@ -103,6 +103,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				DistractingApps.swift,
+				Goal.swift,
 				Schedule.swift,
 			);
 			target = 6BE553F22DA7B261003AAF1E /* ActivityMonitor */;
