@@ -17,39 +17,39 @@ import ManagedSettingsUI
 extension DeviceActivityName {
     static let daily = Self("daily")
 }
-
-extension ManagedSettingsStore.Name {
-    static let ublock = Self("ublock")
-}
-
-class MyMonitor: DeviceActivityMonitor {
-    
-    @Environment(\.modelContext) private var context
-    
-    @Query var distractingApps: [DistractingApps]
-    
-    override func intervalDidStart(for activity: DeviceActivityName) {
-        super.intervalDidStart(for: activity)
-        
-        let uBlockStore = ManagedSettingsStore(named: .ublock)
-        
-        if !distractingApps.isEmpty {
-            uBlockStore.shield.applications = distractingApps.first?.selectionTokens
-        }
-        
-        print("interval started!")
-    }
-    
-    override func intervalDidEnd(for activity: DeviceActivityName) {
-        super.intervalDidEnd(for: activity)
-        
-        let uBlockStore = ManagedSettingsStore(named: .ublock)
-        
-        uBlockStore.shield.applications = nil
-        
-        print("interval ended!")
-    }
-}
+//
+//extension ManagedSettingsStore.Name {
+//    static let ublock = Self("ublock")
+//}
+//
+//class MyMonitor: DeviceActivityMonitor {
+//    
+//    @Environment(\.modelContext) private var context
+//    
+//    @Query var distractingApps: [DistractingApps]
+//    
+//    override func intervalDidStart(for activity: DeviceActivityName) {
+//        super.intervalDidStart(for: activity)
+//        
+//        let uBlockStore = ManagedSettingsStore(named: .ublock)
+//        
+//        if !distractingApps.isEmpty {
+//            uBlockStore.shield.applications = distractingApps.first?.selectionTokens
+//        }
+//        
+//        print("interval started!")
+//    }
+//    
+//    override func intervalDidEnd(for activity: DeviceActivityName) {
+//        super.intervalDidEnd(for: activity)
+//        
+//        let uBlockStore = ManagedSettingsStore(named: .ublock)
+//        
+//        uBlockStore.shield.applications = nil
+//        
+//        print("interval ended!")
+//    }
+//}
 // **********
 
 struct Home: View {
@@ -166,8 +166,7 @@ struct Home: View {
                             toggleBlocking()
                         }
                         .foregroundColor(.white)
-                        .padding(.all, 5.0)
-                        .frame(width: 200, height: 30)
+                        .padding(.all, 10.0)
                         .background(Rectangle()
                             .foregroundColor(blockButtonColor)
                             .cornerRadius(7))
@@ -400,7 +399,9 @@ struct EditGoalsView: View {
                     }
                     .onDelete { indexSet in
                         for index in indexSet {
-                            context.delete(goals[index])
+                            
+                            context.delete(goals.sorted(by: { $0.listIndex < $1.listIndex })[index])
+                            
                         }
                     }
                     if goals.count < 15 {
