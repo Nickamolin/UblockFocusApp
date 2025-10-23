@@ -2,7 +2,7 @@
 
 Read my full thesis <a href="https://libraetd.lib.virginia.edu/public_view/n583xw77w">here</a>.
 
-<img src="https://github.com/Nickamolin/UblockFocusApp/blob/main/UBlockPreview.PNG" width="256">
+<img src="https://github.com/Nickamolin/UblockFocusApp/blob/main/UBlockPreview.PNG" width="256"> <img src="https://github.com/Nickamolin/UblockFocusApp/blob/main/ShieldPreview.PNG" width="256">
 
 <h3>Summary</h3>
 UBlock is an iOS app that allows users to select distracting apps they find, block them during specified hours, and record ideas for productive activities that they would rather dedicate their time to.
