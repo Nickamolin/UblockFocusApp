@@ -16,18 +16,18 @@ Developed using Apple’s IDE (Xcode & SwiftUI) and Screen Time API, this minimu
 
 <h3>Skills Developed</h3>
 
-- Developed an iOS mobile application using Xcode, Swift, SwiftUI, and SwiftData
+- Developed an iOS mobile application using Xcode, Swift, SwiftUI, and SwiftData.
 
-- Integrated Apple’s Screen Time API using Family Controls, Managed Settings, and Device Activity frameworks
+- Integrated Apple’s Screen Time API using Family Controls, Managed Settings, and Device Activity frameworks.
 
-- Implemented app blocking schedules and App Shield overlays to restrict distracting apps during specified hours
+- Implemented app blocking schedules and App Shield overlays to restrict distracting apps during specified hours.
 
-- Built UI sheets and configuration workflows for selecting distracting apps, entering productive goals, and setting schedules
+- Built UI sheets and configuration workflows for selecting distracting apps, entering productive goals, and setting schedules.
 
-- Used data persistence to retain user selections and configurations across app launches
+- Used data persistence to retain user selections and configurations across app launches.
 
-- Conducted customer discovery interviews (23–26 participants) to inform requirements and core feature priorities
+- Conducted customer discovery interviews (23 participants) to inform requirements and core feature priorities.
 
-- Performed competitive analysis of existing screen time solutions (e.g., Opal, one sec) to identify shortcomings
+- Performed competitive analysis of existing screen time solutions (e.g., Opal, one sec) to identify shortcomings.
 
-- Adapted scope based on technical constraints (e.g., sandbox limitations preventing leaderboard implementation)
+- Adapted scope based on technical constraints (e.g., sandbox limitations preventing leaderboard implementation).
