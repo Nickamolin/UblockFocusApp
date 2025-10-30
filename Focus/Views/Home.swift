@@ -22,6 +22,8 @@ extension ManagedSettingsStore.Name {
     static let ublock = Self("ublock")
 }
 
+private let appGroup = "group.com.nicholas.Focus.sharedData"
+
 //class MyMonitor: DeviceActivityMonitor {
 //    
 //    @Environment(\.modelContext) private var context
@@ -322,21 +324,21 @@ struct DistractingAppsBlock: View {
     
 }
 
-struct GoalsBlock: View {
-    
-    var body: some View {
-        
-    }
-    
-}
-
-struct ScheduleBlock: View {
-    
-    var body: some View {
-        
-    }
-    
-}
+//struct GoalsBlock: View {
+//    
+//    var body: some View {
+//        
+//    }
+//    
+//}
+//
+//struct ScheduleBlock: View {
+//    
+//    var body: some View {
+//        
+//    }
+//    
+//}
 
 struct EditDistractingAppsView: View {
     
@@ -461,23 +463,27 @@ struct EditGoalCell: View {
 }
 
 struct EditTimeControlsView: View {
-    
     @Bindable var scheduleToEdit: Schedule
-    
+
+    // This updates immediately in SwiftUI when you flip it elsewhere
+    @AppStorage("isShieldActive", store: UserDefaults(suiteName: appGroup))
+    private var isShieldActive: Bool = false
+
     var body: some View {
-        HStack {
-            DatePicker(
-                "From: ",
-                selection: $scheduleToEdit.from,
-                displayedComponents: .hourAndMinute
-            )
-        }
-        HStack {
-            DatePicker(
-                "To: ",
-                selection: $scheduleToEdit.to,
-                displayedComponents: .hourAndMinute
-            )
+        VStack(spacing: 12) {
+            HStack {
+                DatePicker("From:",
+                           selection: $scheduleToEdit.from,
+                           displayedComponents: .hourAndMinute)
+            }
+            .disabled(isShieldActive)
+
+            HStack {
+                DatePicker("To:",
+                           selection: $scheduleToEdit.to,
+                           displayedComponents: .hourAndMinute)
+            }
+            .disabled(isShieldActive)
         }
     }
 }

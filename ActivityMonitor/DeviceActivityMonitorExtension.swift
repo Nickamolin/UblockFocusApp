@@ -9,6 +9,9 @@ import DeviceActivity
 import SwiftData
 //import _SwiftData_SwiftUI
 import ManagedSettings
+import Foundation
+
+private let appGroup = "group.com.nicholas.Focus.sharedData"
 
 extension ManagedSettingsStore.Name {
     static let ublock = Self("ublock")
@@ -35,6 +38,8 @@ class DeviceActivityMonitorExtension: DeviceActivityMonitor {
         
         print("interval started!")
         
+        UserDefaults(suiteName: appGroup)?.set(true, forKey: "isShieldActive")
+        
         // Handle the start of the interval.
     }
     
@@ -46,6 +51,8 @@ class DeviceActivityMonitorExtension: DeviceActivityMonitor {
         uBlockStore.shield.applications = nil
         
         print("interval ended!")
+        
+        UserDefaults(suiteName: appGroup)?.set(false, forKey: "isShieldActive")
         
         // Handle the end of the interval.
     }
